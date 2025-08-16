@@ -2,6 +2,8 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import data from '../data/data.json';
 import styled from 'styled-components';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 
 const Container = styled.div`
   padding: 2rem;
@@ -53,31 +55,11 @@ const Info = styled.div`
   }
 `;
 
-const Borders = styled.div`
-  margin-top: 1rem;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-
-  strong {
-    margin-right: 0.5rem;
-  }
-`;
-
-const BorderBtn = styled.span`
-  padding: 0.3rem 1rem;
-  border-radius: 5px;
-  background: ${({ dark }) => (dark ? "#2b3945" : "#fff")};
-  box-shadow: 0 0 5px rgba(0,0,0,0.1);
-  font-size: 0.9rem;
-`;
-
 export default function CountryDetail({ darkMode }) {
   const { code } = useParams();
   const country = data.countries.find(c => c.alpha3Code === code);
 
-  if (!country) return <p>Country not found.</p>;
+  if (!country) return <p>country not found.....</p>;
 
   return (
     <Container dark={darkMode}>
@@ -105,6 +87,21 @@ export default function CountryDetail({ darkMode }) {
           )}
         </Info>
       </Layout>
+
+      
+      {country.latlng && (
+        <MapWrapper>
+          <MapContainer center={country.latlng} zoom={5} style={{ height: "100%", width: "100%" }}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <Marker position={country.latlng}>
+              <Popup>{country.name}</Popup>
+            </Marker>
+          </MapContainer>
+        </MapWrapper>
+      )}
     </Container>
   );
 }
